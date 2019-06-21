@@ -1,3 +1,28 @@
+/* This is free and unencumbered software released into the public domain.
+ * 
+ * Anyone is free to copy, modify, publish, use, compile, sell, or
+ * distribute this software, either in source code form or as a compiled
+ * binary, for any purpose, commercial or non-commercial, and by any
+ * means.
+ * 
+ * In jurisdictions that recognize copyright laws, the author or authors
+ * of this software dedicate any and all copyright interest in the
+ * software to the public domain. We make this dedication for the benefit
+ * of the public at large and to the detriment of our heirs and
+ * successors. We intend this dedication to be an overt act of
+ * relinquishment in perpetuity of all present and future rights to this
+ * software under copyright law.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ * 
+ * For more information, please refer to <http://unlicense.org>
+ */
 
 typedef struct cjsn {
 	struct pnt {			/* parent structure      */
@@ -26,6 +51,7 @@ typedef struct cjsn {
 #define cjsn_isobj(x)		(*x == '{')
 #define cjsn_isstr(x)		(*x == '"')
 #define cjsn_error(x)		(*((x)->npos))
+#define cjsn_get_bool(c)	((c)->val.i)
 #define cjsn_get_num(c)		((c)->val.d)
 #define cjsn_get_str(c)		((c)->val.s.ptr)
 #define cjsn_get_strl(c)	((c)->val.s.len)
@@ -42,7 +68,8 @@ extern unsigned cjsn_len(const char *cx);
 extern char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj);
 /** get next json entity.
  *
- * parses the next json entity from cx and updates cj accoringly.
+ * parses the next json entity from cx and updates cj accoringly. if cx is
+ * NULL, step will continue after the last found entity.
  * 
  * returns:
  * 	pointer to the first char of the entity, if one is found.
