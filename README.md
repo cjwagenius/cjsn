@@ -1,6 +1,7 @@
 # cjsn
 An extremly lightweight & simple json-parser.
 
+cjsn only works with the string provided. No further allocations are needed.
 ```
 #include <stdio.h>
 #include <stdlib.h>
