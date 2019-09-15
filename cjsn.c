@@ -138,9 +138,9 @@ char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj
 	if (!(x = cjsn_step(cx, cj)))
 		return NULL;
 	while (cjsn_step(NULL, cj)) {
-		if ((keyl == -1 || keyl == cj->key.len) &&
-		    !strncmp(key, cj->key.ptr, cj->key.len) &&
-		    !key[cj->key.len])
+		int of_same_len =
+		    (keyl == -1 ? !key[cj->key.len] : keyl == cj->key.len);
+		if (of_same_len && !strncmp(key, cj->key.ptr, cj->key.len))
 			return cj->sp;
 	}
 
