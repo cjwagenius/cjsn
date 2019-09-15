@@ -22,6 +22,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  * 
  * For more information, please refer to <http://unlicense.org>
+ *
+ * WWW: https://github.com/cjwagenius/cjsn
  */
 
 #include <ctype.h>
@@ -124,7 +126,7 @@ unsigned cjsn_len(const char *cx)
 	
 	return cjsn_error(&cj) ? -1 : l;
 }
-char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj)
+char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj)
 {
 	char *x;
 	struct cjsn st;
@@ -136,7 +138,8 @@ char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj)
 	if (!(x = cjsn_step(cx, cj)))
 		return NULL;
 	while (cjsn_step(NULL, cj)) {
-		if (!strncmp(key, cj->key.ptr, cj->key.len) &&
+		if ((keyl == -1 || keyl == cj->key.len) &&
+		    !strncmp(key, cj->key.ptr, cj->key.len) &&
 		    !key[cj->key.len])
 			return cj->sp;
 	}

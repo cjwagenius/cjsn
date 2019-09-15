@@ -22,6 +22,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  * 
  * For more information, please refer to <http://unlicense.org>
+ *
+ * WWW: https://github.com/cjwagenius/cjsn
  */
 
 typedef struct cjsn {
@@ -65,7 +67,9 @@ typedef struct cjsn {
 extern unsigned cjsn_len(const char *cx);
 /** get a item from an object.
  **/
-extern char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj);
+extern char *cjsn_obj_get(const char *cx, const char *key, size_t keyl,
+			  struct cjsn *cj);
+
 /** get next json entity.
  *
  * parses the next json entity from cx and updates cj accoringly. if cx is
