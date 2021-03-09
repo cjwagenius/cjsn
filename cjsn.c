@@ -42,23 +42,20 @@ static inline char *skipws(const char *str) {
 
 	return (char*)str;
 }
-static char *find_closing(char *str)
-{
-	int sch;	/* start char */
-	int ech = 0;	/* end char   */
+static char *find_closing(char *str) {
+
+	int sch = *str;	/* start char                   */
+	int ech = 0;	/* end char                     */
 	int depth = 1;
-	int quote = 0;
+	int quote = 0;	/* is parsing within quotation? */
 
-	assert(str != NULL);
-
-	sch = *str;
 	if (sch == '"')
 		ech = '"';
 	else if (sch == '[')
 		ech = ']';
 	else if (sch == '{')
 		ech = '}';
-	assert(ech != 0); /* invalid start character left ech == 0 */
+	assert(ech != 0 && "a invalid start character left ech == 0");
 
 	for (str += 1; *str; str += 1) {
 		if ((*str == '"') && (*(str-1) != '\\')) {
@@ -78,8 +75,8 @@ static char *find_closing(char *str)
 	
 	return *str ? str : NULL;
 }
-static char *next(char *str, char **endptr, void *val)
-{
+static char *next(char *str, char **endptr, void *val) {
+
 	char *ep;
 	double d;
 
@@ -106,8 +103,8 @@ static char *next(char *str, char **endptr, void *val)
 	return str;
 }
 
-unsigned cjsn_len(const char *cx)
-{
+unsigned cjsn_len(const char *cx) {
+
 	char *x;
 	size_t l = 0;
 	struct cjsn cj;
@@ -123,8 +120,7 @@ unsigned cjsn_len(const char *cx)
 	
 	return cjsn_error(&cj) ? -1 : l;
 }
-char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj)
-{
+char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj) {
 	char *x;
 	struct cjsn st;
 
@@ -143,8 +139,8 @@ char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj
 
 	return NULL;
 }
-char *cjsn_step(const char *cx, struct cjsn *cj)
-{
+char *cjsn_step(const char *cx, struct cjsn *cj) {
+
 	char *ep;
 	char *rtn;
 
@@ -161,7 +157,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj)
 	
 	/* if we're stepping an array/object (cj->pnt.sp != NULL). */
 	if (cj->pnt.sp) {
-		/* if the pnt array/object was the last type found
+		/**
+		 * if the pnt array/object was the last type found
 		 * (cj->pnt.sp == cj->sp), we're not expecting a
 		 * comma before a type. Otherwise we do, and in that case
 		 * we'll have to traverse it.
@@ -172,7 +169,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj)
 			cj->npos += 1;
 			cj->npos = skipws(cj->npos);
 		}
-		/* if the parent is an object, we expect a key and a colon
+		/**
+		 * if the parent is an object, we expect a key and a colon
 		 * before any type. We handle all of it here.
 		 **/
 		if (*cj->pnt.sp == '{') {
@@ -188,7 +186,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj)
 		}
 	}
 	if ((rtn = next(cj->npos, &ep, &cj->val.i))) {
-		/* if cx is not NULL, and type is an array/object, set parent
+		/**
+		 * if cx is not NULL, and type is an array/object, set parent
 		 * values in the state.
 		 **/
 		if (cx && (*rtn == '[' || *rtn == '{')) {
@@ -205,8 +204,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj)
 
 	return rtn;
 }
-int cjsn_type(const char *cx)
-{
+int cjsn_type(const char *cx) {
+
 	char *ep;
 
 	assert(cx != NULL);
