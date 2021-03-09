@@ -31,7 +31,8 @@
 
 #include "runtest.h"
 
-#include "../cjsn.c"
+#define CJSN_DEFINE
+#include "../cjsn.h"
 
 void tst_find_closing(void) {
 
