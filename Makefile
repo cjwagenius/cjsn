@@ -24,6 +24,7 @@
 # For more information, please refer to <http://unlicense.org>
 #
 
+CFLAGS+=-Wall -pedantic -std=c89
 VPATH=tst
 
 cjsn_tst: cjsn_tst.c

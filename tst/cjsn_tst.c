@@ -33,17 +33,6 @@
 
 #include "../cjsn.c"
 
-void tst_skipws(void)
-{
-	char *p;
-	char buf[] = "   null";
-
-	p = skipws(buf+3);
-	assert(p == buf+3);
-
-	p = skipws(buf);
-	assert(p == buf+3);
-}
 void tst_find_closing(void)
 {
 	char *p;
@@ -134,7 +123,6 @@ void tst_cjsn_type(void)
 
 int main(int argc, char **argv)
 {
-	RUNTEST(tst_skipws);
 	RUNTEST(tst_find_closing);
 	RUNTEST(tst_next);
 

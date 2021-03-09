@@ -35,13 +35,14 @@
 #include "cjsn.h"
 
 #define issep(x)  (!x || isspace(x) || strchr(",]}", x))
+#define skipws(x) while (isspace(*x)) x++
 
-static inline char *skipws(const char *str) {
+/*static inline char *skipws(const char *str) {
 
 	while (isspace(*str)) str ++;
 
 	return (char*)str;
-}
+}*/
 static char *find_closing(char *str) {
 
 	int sch = *str;	/* start char                   */
@@ -150,7 +151,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 		cj->pnt.sp = cj->pnt.ep = NULL;
 		cj->npos = (char*) cx;
 	}
-	if (!*(cj->npos = skipws(cj->npos)) || cj->npos == cj->pnt.ep) {
+	skipws(cj->npos);
+	if (!*cj->npos || cj->npos == cj->pnt.ep) {
 		cj->npos = "";
 		return NULL;
 	}
@@ -166,8 +168,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 		if (cj->pnt.sp != cj->sp) {
 			if (*cj->npos != ',')
 				return NULL;
-			cj->npos += 1;
-			cj->npos = skipws(cj->npos);
+			cj->npos ++;
+			skipws(cj->npos);
 		}
 		/**
 		 * if the parent is an object, we expect a key and a colon
@@ -179,10 +181,11 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 			/*cj->key.ptr = cj->npos+1;*/
 			cj->key.len = ep - (cj->npos+1);
 			cj->npos = ep+1;
-			if (*(cj->npos = skipws(cj->npos)) != ':')
+			skipws(cj->npos);
+			if (*cj->npos != ':')
 				return NULL;
-			cj->npos += 1;
-			cj->npos = skipws(cj->npos);
+			cj->npos ++;
+			skipws(cj->npos);
 		}
 	}
 	if ((rtn = next(cj->npos, &ep, &cj->val.i))) {
