@@ -29,6 +29,8 @@
 #ifndef CJSN_H
 #define CJSN_H
 
+#include <stdio.h>
+
 #define cjsn_isbool(x)		(*x == 't' || *x == 'f')
 #define cjsn_isnull(x)		(*x == 'n')
 #define cjsn_isnum(x)		(cjsn_type(x) == '0')
@@ -68,7 +70,7 @@ typedef struct cjsn {
 } cjsn;
 
 extern unsigned cjsn_len(const char *cx);
-extern char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj);
+extern char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj);
 extern char *cjsn_step(const char *cx, struct cjsn *cj);
 extern int cjsn_type(const char *cx);
 
@@ -169,7 +171,7 @@ unsigned cjsn_len(const char *cx) {
 	
 	return cjsn_error(&cj) ? -1 : l;
 }
-char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj) {
+char *cjsn_obj_get(const char *cx, const char *key, struct cjsn *cj) {
 
 	char *x;
 	struct cjsn st;
@@ -181,9 +183,7 @@ char *cjsn_obj_get(const char *cx, const char *key, size_t keyl, struct cjsn *cj
 	if (!(x = cjsn_step(cx, cj)))
 		return NULL;
 	while (cjsn_step(NULL, cj)) {
-		int of_same_len =
-		    (keyl == -1 ? !key[cj->key.len] : keyl == cj->key.len);
-		if (of_same_len && !strncmp(key, cj->key.ptr, cj->key.len))
+		if (!strncmp(key, cj->key.ptr, cj->key.len))
 			return cj->sp;
 	}
 

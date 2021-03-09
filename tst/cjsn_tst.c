@@ -104,10 +104,10 @@ void tst_cjsn_obj_get(void) {
 	char *x;
 	char b[] = "{\"one\":1,\"two\":2}";
 
-	x = cjsn_obj_get(b, "three", 5, NULL);
+	x = cjsn_obj_get(b, "three", NULL);
 	assert(x == NULL);
 
-	x = cjsn_obj_get(b, "two", -1, NULL);
+	x = cjsn_obj_get(b, "two", NULL);
 	assert(x != NULL);
 	
 }
