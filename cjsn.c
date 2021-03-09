@@ -34,16 +34,13 @@
 
 #include "cjsn.h"
 
-#define issep(x) (!x || isspace(x) || strchr(",]}", x))
+#define issep(x)  (!x || isspace(x) || strchr(",]}", x))
 
-static char *skipws(const char *str)
-{
-	assert(str != NULL);
+static inline char *skipws(const char *str) {
 
-	while (isspace(*str))
-		str++;
+	while (isspace(*str)) str ++;
 
-	return (char*) str;
+	return (char*)str;
 }
 static char *find_closing(char *str)
 {
