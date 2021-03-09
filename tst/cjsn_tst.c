@@ -82,15 +82,32 @@ void tst_cjsn_step(void) {
 
 	struct cjsn st;
 
-	assert(*cjsn_step("[ [ ], \"\" ]", &st) == '[');
-	assert(*cjsn_step(NULL, &st) == '[');
-	assert(*cjsn_step(NULL, &st) == '"');
+	/* Doesn't look like json */
+	assert(cjsn_step("adfge", &st) == NULL);
+	assert(cjsn_error(&st));
+
+	/* one single item is ok for cjsn */
+	assert(cjsn_isnull(cjsn_step("null", &st)));
+	assert(cjsn_step(NULL, &st) == NULL);
+	assert(!cjsn_error(&st));
+
+	/* but not two, if they're not within an array or object */
+	assert(cjsn_isbool(cjsn_step("true, null", &st)));
+	assert(cjsn_get_bool(&st) != 0);
+	assert(cjsn_step(NULL, &st) == NULL);
+	assert(cjsn_error(&st));
+
+	/* step though an array */
+	assert(cjsn_isarr(cjsn_step("[ [ ], \"\" ]", &st)));
+	assert(cjsn_isarr(cjsn_step(NULL, &st)));
+	assert(cjsn_isstr(cjsn_step(NULL, &st)));
 	assert(st.val.s.len == 0);
 	assert(!cjsn_step(NULL, &st) && !cjsn_error(&st));
 	
-	assert(*cjsn_step("{ \"one\": 0.5, \"two\": { } }", &st) == '{');
+	/* step though an object */
+	assert(cjsn_isobj(cjsn_step("{ \"one\": 0.5, \"two\": { } }", &st)));
 	assert(cjsn_isnum(cjsn_step(NULL, &st)));
-	assert(*cjsn_step(NULL, &st) == '{');
+	assert(cjsn_isobj(cjsn_step(NULL, &st)));
 	assert(!cjsn_step(NULL, &st) && !cjsn_error(&st));
 }
 void tst_cjsn_len(void) {
