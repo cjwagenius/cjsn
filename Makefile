@@ -25,7 +25,9 @@
 #
 
 CFLAGS+=-Wall -pedantic -std=c89
-VPATH=tst
+VPATH=test example
 
 cjsn_tst: cjsn_tst.c
+
+jsnparse: jsnparse.c
 
