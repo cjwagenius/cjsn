@@ -37,12 +37,6 @@
 #define issep(x)  (!x || isspace(x) || strchr(",]}", x))
 #define skipws(x) while (isspace(*x)) x++
 
-/*static inline char *skipws(const char *str) {
-
-	while (isspace(*str)) str ++;
-
-	return (char*)str;
-}*/
 static char *find_closing(char *str) {
 
 	int sch = *str;	/* start char                   */
@@ -63,45 +57,51 @@ static char *find_closing(char *str) {
 			if (ech == '"')
 				return str;
 			quote = !quote;
-		} else if (quote) {
-			continue;
-		} else if (*str == sch) {
-			depth += 1;
-		} else if (*str == ech) {
-			depth -= 1;
-			if (!depth)
-				break;
+		}
+		if (!quote) {
+			if (*str == sch) {
+				depth ++;
+			} else if (*str == ech) {
+				depth --;
+				if (!depth)
+					break;
+			}
 		}
 	}
 	
 	return *str ? str : NULL;
 }
-static char *next(char *str, char **endptr, void *val) {
+static char *next(char *str, char **ep, void *val) {
 
-	char *ep;
 	double d;
 
-	assert(str != NULL && endptr != NULL && val != NULL);
+	assert(str != NULL && ep != NULL && val != NULL);
 
-	if ((d = strtod(str, &ep)) || ep != str) {
+	d = strtod(str, ep);
+	if (*ep != str) {
 		*((double*) val) = d;
-	} else if (strchr("\"[{", *str)) {
-		if (!(ep = find_closing(str)))
+		return str;
+	}
+	if (strchr("\"[{", *str)) {
+		if (!(*ep = find_closing(str)))
 			return NULL;
-		*((char**) val) = str+1;
-		ep += 1;
-	} else if (!strncmp(str, "true", 4) && issep(*(ep = str+4))) {
-		*((int*) val) = 1;
-	} else if ((!strncmp(str, "null", 4) && issep(*(ep = str+4))) ||
-	    (!strncmp(str, "false", 5) && issep(*(ep = str+5)))) {
+		*((char**) val) = str + 1;
+		return str;
+	}
+	if (issep(str[4])) {
+		if (!strncmp(str, "true", 4) || !strncmp(str, "null", 4)) {
+			*((int*) val) = *str == 't' ? 1 : 0;
+			*ep += 4;
+			return str;
+		}
+	}
+	if (issep(str[5]) && !strncmp(str, "false", 5)) {
 		*((int*) val) = 0;
-	} else {
-		return NULL;
+		*ep += 5;
+		return str;
 	}
 
-	if (endptr) *endptr = ep-1;
-
-	return str;
+	return NULL;
 }
 
 unsigned cjsn_len(const char *cx) {
@@ -114,7 +114,7 @@ unsigned cjsn_len(const char *cx) {
 
 	if (!(x = cjsn_step(cx, &cj)))
 		return -1;
-	if (*x != '[' && *x != '{')
+	if (!cjsn_isarr(x) && !cjsn_isobj(x))
 		return 1;
 	while (cjsn_step(NULL, &cj))
 		l += 1;
@@ -148,7 +148,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 	assert(cj != NULL && "cjsn_step: invalid argument");
 
 	if (cx) {
-		cj->pnt.sp = cj->pnt.ep = NULL;
+		cj->pnt.sp = NULL;
+		cj->pnt.ep = NULL;
 		cj->npos = (char*) cx;
 	}
 	skipws(cj->npos);
@@ -178,9 +179,8 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 		if (*cj->pnt.sp == '{') {
 			if (*next(cj->npos, &ep, &cj->key.ptr) != '"')
 				return NULL;
-			/*cj->key.ptr = cj->npos+1;*/
-			cj->key.len = ep - (cj->npos+1);
-			cj->npos = ep+1;
+			cj->key.len = ep - cj->key.ptr;
+			cj->npos = ep + 1;
 			skipws(cj->npos);
 			if (*cj->npos != ':')
 				return NULL;
@@ -188,24 +188,27 @@ char *cjsn_step(const char *cx, struct cjsn *cj) {
 			skipws(cj->npos);
 		}
 	}
-	if ((rtn = next(cj->npos, &ep, &cj->val.i))) {
+	if (!(rtn = next(cj->npos, &ep, &cj->val.i)))
+		return NULL;
+
+	if (cjsn_isaos(rtn)) {
 		/**
-		 * if cx is not NULL, and type is an array/object, set parent
-		 * values in the state.
+		 * If [cx] is not NULL, and type is an array/object, set parent
+		 * values of this state.
 		 **/
-		if (cx && (*rtn == '[' || *rtn == '{')) {
+		if (cx && !cjsn_isstr(rtn)) {
 			cj->pnt.sp = cj->sp = cj->npos;
 			cj->pnt.ep = ep;
-			cj->npos += 1;
 		} else {
-			if (*rtn == '"')
-				cj->val.s.len = ep - (rtn+1);
-			cj->sp = cj->npos;
-			cj->npos = ep+1;
+			cj->npos = ep;
 		}
+		cj->npos += 1;
+		cj->val.s.len = ep - cj->val.s.ptr;
+	} else {
+		cj->npos = ep;
 	}
 
-	return rtn;
+	return (cj->sp = rtn);
 }
 int cjsn_type(const char *cx) {
 
@@ -213,9 +216,9 @@ int cjsn_type(const char *cx) {
 
 	assert(cx != NULL);
 
-	if (strchr("\"[{n", *cx))
+	if (cjsn_isaos(cx) || cjsn_isnull(cx))
 		return *cx;
-	if (*cx == 't' || *cx == 'f')
+	if (cjsn_isbool(cx))
 		return 'b';
 	if (strtod(cx, &ep) || ep != cx)
 		return '0';

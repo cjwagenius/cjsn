@@ -33,8 +33,8 @@
 
 #include "../cjsn.c"
 
-void tst_find_closing(void)
-{
+void tst_find_closing(void) {
+
 	char *p;
 	char buf[] = "{\"a\":[\"]}\\\"\"]}";
 
@@ -52,8 +52,8 @@ void tst_find_closing(void)
 	p = find_closing("{{}");
 	assert(p == NULL);
 }
-void tst_next(void)
-{
+void tst_next(void) {
+
 	char *t;
 	char *ep;
 	union v { int i; double d; char *p; } v;
@@ -64,21 +64,21 @@ void tst_next(void)
 	t = next(b+7, &ep, &v.p);
 	assert(*t == '[' && *ep == ']');
 	t = next(b+8, &ep, &v.i);
-	assert(*t == 'n' && ep == t+3 && v.i == 0);
+	assert(*t == 'n' && ep == t+4 && v.i == 0);
 	t = next(b+13, &ep, &v.i);
-	assert(*t == 't' && ep == t+3 && v.i == 1);
+	assert(*t == 't' && ep == t+4 && v.i == 1);
 	t = next(b+18, &ep, &v.i);
-	assert(*t == 'f' && ep == t+4 && v.i == 0);
+	assert(*t == 'f' && ep == t+5 && v.i == 0);
 	t = next(b+24, &ep, &v.d);
-	assert(*t == '1' && ep == t+2 && v.d == 1.0);
+	assert(*t == '1' && ep == t+3 && v.d == 1.0);
 	t = next(b+28, &ep, &v.p);
 	assert(*t == '"' && ep == t+7 && v.p == t+1);
 	t = next(b+37, &ep, &v.p);
 	assert(t == NULL);
 }
 
-void tst_cjsn_step(void)
-{
+void tst_cjsn_step(void) {
+
 	struct cjsn st;
 
 	assert(*cjsn_step("[ [ ], \"\" ]", &st) == '[');

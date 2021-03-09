@@ -47,11 +47,13 @@ typedef struct cjsn {
 	char *npos;		/* next position in data  */
 } cjsn;
 
-#define cjsn_isbool(x)		(cjsn_type(x) == 'b')
+#define cjsn_isbool(x)		(*x == 't' || *x == 'f')
+#define cjsn_isnull(x)		(*x == 'n')
 #define cjsn_isnum(x)		(cjsn_type(x) == '0')
 #define cjsn_isarr(x)		(*x == '[')
 #define cjsn_isobj(x)		(*x == '{')
 #define cjsn_isstr(x)		(*x == '"')
+#define cjsn_isaos(x)		(cjsn_isarr(x)||cjsn_isobj(x)||cjsn_isstr(x))
 #define cjsn_error(x)		(*((x)->npos))
 #define cjsn_get_bool(c)	((c)->val.i)
 #define cjsn_get_num(c)		((c)->val.d)
