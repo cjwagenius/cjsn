@@ -39,9 +39,9 @@
 
 	Query the state (when cjsn_step() returns NULL) if there was
 	an error.
-<pre>
+</pre>
 ## Functions:
-
+<pre>
     <b>unsigned cjsn_len(const char *cx)</b>
 
 	Returns the length of the json-item at [cx]. If [cx] isn't a
