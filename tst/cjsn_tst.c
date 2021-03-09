@@ -93,14 +93,14 @@ void tst_cjsn_step(void) {
 	assert(*cjsn_step(NULL, &st) == '{');
 	assert(!cjsn_step(NULL, &st) && !cjsn_error(&st));
 }
-void tst_cjsn_len(void)
-{
+void tst_cjsn_len(void) {
+
 	assert(cjsn_len("[1,2 3]") == -1);
 	assert(cjsn_len("\"str\"") == 1);
 	assert(cjsn_len("[1,2,3]") == 3);
 }
-void tst_cjsn_obj_get(void)
-{
+void tst_cjsn_obj_get(void) {
+
 	char *x;
 	char b[] = "{\"one\":1,\"two\":2}";
 
@@ -111,8 +111,8 @@ void tst_cjsn_obj_get(void)
 	assert(x != NULL);
 	
 }
-void tst_cjsn_type(void)
-{
+void tst_cjsn_type(void) {
+
 	assert(cjsn_type("null") == 'n');
 	assert(cjsn_type("true") == 'b');
 	assert(cjsn_type("false") == 'b');
@@ -122,8 +122,8 @@ void tst_cjsn_type(void)
 	assert(cjsn_type("{ }") == '{');
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
+
 	RUNTEST(tst_find_closing);
 	RUNTEST(tst_next);
 
@@ -134,3 +134,4 @@ int main(int argc, char **argv)
 
 	return EXIT_SUCCESS;
 }
+
